@@ -10,7 +10,7 @@ import in.ka4tik.dino.PlayState;
 
 public class Dino {
     private static final int GRAVITY = -300;
-    private static final int FORWARD_VELOCITY = 100;
+    private static final int FORWARD_VELOCITY = 150;
     private Vector3 position, velocity;
     private Rectangle bounds;
     private Texture texture;
@@ -43,8 +43,10 @@ public class Dino {
     }
 
     public void jump() {
-        velocity.y = 250;
-        jump.play(0.5f);
+        if (position.y == PlayState.GROUND_HEIGHT + PlayState.DINO_OFFSET) {
+            velocity.y = 250;
+            jump.play(0.5f);
+        }
     }
 
     public Rectangle getBounds() {
