@@ -2,6 +2,7 @@ package in.ka4tik.dino;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
 import in.ka4tik.dino.sprites.Cactus;
@@ -24,16 +25,23 @@ public class PlayState extends State {
     private Vector2 groundPos1, groundPos2;
     private List<Cactus> cactuses;
     private Random random;
+    private int score = 0, highScore = 0;
+    private BitmapFont font = new BitmapFont();
 
     public PlayState(GameStateManager gsm) {
         super(gsm);
+        cactuses = new ArrayList<Cactus>();
+        random = new Random();
+
         cam.setToOrtho(false, DinoGame.WIDTH * VIEWPORT_SCALING_FACTOR, DinoGame.HEIGHT * VIEWPORT_SCALING_FACTOR);
         ground = new Texture("ground.png");
         groundPos1 = new Vector2(cam.position.x - cam.viewportWidth / 2, GROUND_HEIGHT);
         groundPos2 = new Vector2((cam.position.x - cam.viewportWidth / 2) + ground.getWidth() * ASSETS_SCALING_FACTOR, GROUND_HEIGHT);
-        random = new Random();
+        generateCatuses(cactuses, groundPos2.x, Cactus.getTexture().getWidth() * ASSETS_SCALING_FACTOR);
+
         dino = new Dino(0, GROUND_HEIGHT + DINO_OFFSET);
-        cactuses = new ArrayList<Cactus>();
+
+        highScore = HighScoreManager.instance.getHighScore();
     }
 
     @Override
@@ -46,12 +54,22 @@ public class PlayState extends State {
     public void update(float dt) {
         handleInput();
         updateView();
-        cam.position.x = dino.getPosition().x + 80;
+        cam.position.x = dino.getPosition().x + 90;
 
         dino.update(dt);
         cam.update();
-        if (checkCollisions())
+        if (checkCollisions()) {
             gsm.set(new PlayState(gsm));
+            HighScoreManager.instance.saveHighScore(highScore);
+        }
+
+        for (Cactus cactus : cactuses) {
+            if (!cactus.marked && dino.getPosition().x + dino.getWidth() > cactus.getPosition().x + cactus.getWidth()) {
+                score++;
+                cactus.marked = true;
+            }
+        }
+        highScore = Math.max(score, highScore);
     }
 
     private boolean checkCollisions() {
@@ -74,13 +92,19 @@ public class PlayState extends State {
             sb.draw(Cactus.getTexture(), cactus.getPosition().x, cactus.getPosition().y, cactus.getWidth(), cactus.getHeight());
         }
         sb.draw(dino.getTexture(), dino.getPosition().x, dino.getPosition().y, dino.getHeight(), dino.getHeight());
+        font.draw(sb, "Score: " + score + "", cam.position.x, cam.position.y);
+        font.draw(sb, "HighScore: " + highScore + "", cam.position.x, cam.position.y + 20);
 
         sb.end();
     }
 
     @Override
     public void dispose() {
-
+        ground.dispose();
+        font.dispose();
+        dino.dispose();
+        for (Cactus cactus : cactuses)
+            cactus.dispose();
     }
 
     private void updateView() {
@@ -98,7 +122,6 @@ public class PlayState extends State {
         if (cam.position.x - (cam.viewportWidth / 2) > groundPos2.x + ground.getWidth() * ASSETS_SCALING_FACTOR) {
             groundPos2.add(ground.getWidth() * ASSETS_SCALING_FACTOR * 2, 0);
             generateCatuses(cactuses, groundPos2.x, Cactus.getTexture().getWidth() * ASSETS_SCALING_FACTOR);
-
 
         }
     }
@@ -132,5 +155,6 @@ public class PlayState extends State {
             }
         }
     }
+
 
 }

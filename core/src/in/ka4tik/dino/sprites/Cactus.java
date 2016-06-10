@@ -8,6 +8,7 @@ public class Cactus {
 
     public static final float ASSETS_SCALING_FACTOR = 0.3f;
     private static final Texture texture = new Texture("cactus.png");
+    public boolean marked;
     private Vector3 position;
     private Rectangle bounds;
     private float scale;
@@ -16,6 +17,7 @@ public class Cactus {
         position = new Vector3(x, y, 0);
         bounds = new Rectangle(x, y, texture.getWidth() * ASSETS_SCALING_FACTOR * scale, texture.getHeight() * ASSETS_SCALING_FACTOR * scale);
         this.scale = scale;
+        this.marked = false;
     }
 
     public static Texture getTexture() {

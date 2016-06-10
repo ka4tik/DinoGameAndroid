@@ -8,24 +8,35 @@ import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector3;
 import in.ka4tik.dino.PlayState;
 
+import java.util.Arrays;
+import java.util.List;
+
 public class Dino {
     public static final float ASSETS_SCALING_FACTOR = 0.3f;
     private static final int GRAVITY = -500;
     private static final int FORWARD_VELOCITY = 200;
     private Vector3 position, velocity;
     private Rectangle bounds;
-    private Texture texture;
+    private Texture dino_texture1, dino_texture2, dino_jump_texture;
     private Sound jump;
+    private Animation dinoAnimation;
 
     public Dino(int x, int y) {
         position = new Vector3(x, y, 0);
         velocity = new Vector3(0, 0, 0);
-        texture = new Texture("dino_ground.png");
-        bounds = new Rectangle(x, y, texture.getWidth() * ASSETS_SCALING_FACTOR, texture.getHeight() * ASSETS_SCALING_FACTOR);
+        dino_texture1 = new Texture("dino_ground.png");
+        dino_texture2 = new Texture("dino_ground_2.png");
+        dino_jump_texture = new Texture("dino_jump.png");
+
+        List<Texture> places = Arrays.asList(dino_texture1, dino_texture2);
+
+        dinoAnimation = new Animation(places, 0.5f);
+        bounds = new Rectangle(x, y, dino_texture1.getWidth() * ASSETS_SCALING_FACTOR, dino_texture1.getHeight() * ASSETS_SCALING_FACTOR);
         jump = Gdx.audio.newSound(Gdx.files.internal("sfx_wing.ogg"));
     }
 
     public void update(float dt) {
+        dinoAnimation.update(dt);
         if (position.y >= PlayState.GROUND_HEIGHT + PlayState.DINO_OFFSET)
             velocity.add(0, GRAVITY * dt, 0);
         position.add(FORWARD_VELOCITY * dt, velocity.y * dt, 0);
@@ -40,15 +51,18 @@ public class Dino {
     }
 
     public Texture getTexture() {
-        return texture;
+        if(velocity.y > 0) {
+            return dino_jump_texture;
+        }
+        return dinoAnimation.getFrame();
     }
 
     public int getHeight() {
-        return (int) (texture.getHeight() * ASSETS_SCALING_FACTOR);
+        return (int) (dino_texture1.getHeight() * ASSETS_SCALING_FACTOR);
     }
 
     public int getWidth() {
-        return (int) (texture.getWidth() * ASSETS_SCALING_FACTOR);
+        return (int) (dino_texture1.getWidth() * ASSETS_SCALING_FACTOR);
     }
 
     public void jump() {
@@ -63,7 +77,8 @@ public class Dino {
     }
 
     public void dispose() {
-        texture.dispose();
+        dino_texture1.dispose();
+        dino_texture2.dispose();
         jump.dispose();
     }
 
