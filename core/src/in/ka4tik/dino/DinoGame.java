@@ -18,7 +18,7 @@ public class DinoGame extends ApplicationAdapter {
         batch = new SpriteBatch();
         gsm = new GameStateManager();
         gsm.push(new MenuState(gsm));
-        Gdx.gl.glClearColor(244f/255, 244f/255, 244f/255, 1); //grey
+        Gdx.gl.glClearColor(244f / 255, 244f / 255, 244f / 255, 1); //grey
     }
 
     @Override

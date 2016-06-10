@@ -9,8 +9,9 @@ import com.badlogic.gdx.math.Vector3;
 import in.ka4tik.dino.PlayState;
 
 public class Dino {
-    private static final int GRAVITY = -300;
-    private static final int FORWARD_VELOCITY = 150;
+    public static final float ASSETS_SCALING_FACTOR = 0.3f;
+    private static final int GRAVITY = -500;
+    private static final int FORWARD_VELOCITY = 200;
     private Vector3 position, velocity;
     private Rectangle bounds;
     private Texture texture;
@@ -20,7 +21,7 @@ public class Dino {
         position = new Vector3(x, y, 0);
         velocity = new Vector3(0, 0, 0);
         texture = new Texture("dino_ground.png");
-        bounds = new Rectangle(x, y, texture.getWidth(), texture.getHeight());
+        bounds = new Rectangle(x, y, texture.getWidth() * ASSETS_SCALING_FACTOR, texture.getHeight() * ASSETS_SCALING_FACTOR);
         jump = Gdx.audio.newSound(Gdx.files.internal("sfx_wing.ogg"));
     }
 
@@ -42,9 +43,17 @@ public class Dino {
         return texture;
     }
 
+    public int getHeight() {
+        return (int) (texture.getHeight() * ASSETS_SCALING_FACTOR);
+    }
+
+    public int getWidth() {
+        return (int) (texture.getWidth() * ASSETS_SCALING_FACTOR);
+    }
+
     public void jump() {
-        if (position.y == PlayState.GROUND_HEIGHT + PlayState.DINO_OFFSET) {
-            velocity.y = 250;
+        if (position.y < PlayState.GROUND_HEIGHT + PlayState.DINO_OFFSET + 25) {
+            velocity.y = 300;
             jump.play(0.5f);
         }
     }
