@@ -54,12 +54,12 @@ public class PlayState extends State {
     public void update(float dt) {
         handleInput();
         updateView();
-        cam.position.x = dino.getPosition().x + 90;
+        cam.position.x = dino.getPosition().x + 150;
 
-        dino.update(dt);
+        dino.update(dt, score);
         cam.update();
         if (checkCollisions()) {
-            gsm.set(new PlayState(gsm));
+            gsm.set(new MenuState(gsm));
             HighScoreManager.instance.saveHighScore(highScore);
         }
 
@@ -129,7 +129,7 @@ public class PlayState extends State {
 
     private void generateCatuses(List<Cactus> cactuses, float offset, float cactusWidth) {
 
-        int number = 1 + random.nextInt(2);
+        int number = 1 + random.nextInt(1);
         for (int i = 0; i < number; i++) {
             float x = 0;
             int iterations = 0;

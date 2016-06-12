@@ -14,7 +14,10 @@ import java.util.List;
 public class Dino {
     public static final float ASSETS_SCALING_FACTOR = 0.3f;
     private static final int GRAVITY = -500;
-    private static final int FORWARD_VELOCITY = 200;
+    private static final int FORWARD_VELOCITY = 300;
+    private static final int MAX_FORWARD_VELOCITY = 600;
+    private static final int MAX_GRAVITY = -1000;
+
     private Vector3 position, velocity;
     private Rectangle bounds;
     private Texture dino_texture1, dino_texture2, dino_jump_texture;
@@ -35,11 +38,11 @@ public class Dino {
         jump = Gdx.audio.newSound(Gdx.files.internal("sfx_wing.ogg"));
     }
 
-    public void update(float dt) {
+    public void update(float dt, int score) {
         dinoAnimation.update(dt);
         if (position.y >= PlayState.GROUND_HEIGHT + PlayState.DINO_OFFSET)
-            velocity.add(0, GRAVITY * dt, 0);
-        position.add(FORWARD_VELOCITY * dt, velocity.y * dt, 0);
+            velocity.add(0, getCurrentGravity(score) * dt, 0);
+        position.add(getCurrentForwardSpeed(score) *dt, velocity.y * dt, 0);
         if (position.y < PlayState.GROUND_HEIGHT + PlayState.DINO_OFFSET)
             position.y = PlayState.GROUND_HEIGHT + PlayState.DINO_OFFSET;
 
@@ -51,7 +54,7 @@ public class Dino {
     }
 
     public Texture getTexture() {
-        if(velocity.y > 0) {
+        if (velocity.y > 0) {
             return dino_jump_texture;
         }
         return dinoAnimation.getFrame();
@@ -80,6 +83,12 @@ public class Dino {
         dino_texture1.dispose();
         dino_texture2.dispose();
         jump.dispose();
+    }
+    public int getCurrentForwardSpeed(int score){
+        return (int) Math.min(MAX_FORWARD_VELOCITY, ((double)score / 25 + 1) * FORWARD_VELOCITY);
+    }
+    public int getCurrentGravity(int score){
+        return (int) Math.min(MAX_GRAVITY, ((double)score / 25 + 1) * GRAVITY);
     }
 
 }
